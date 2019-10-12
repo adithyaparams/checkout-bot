@@ -20,7 +20,7 @@ class Browser {
         
         let page = await this.browser.newPage();
         // await page.setUserAgent(this.userAgent);
-        return page
+        return page;
     }
 }
 
@@ -32,22 +32,22 @@ class Page {
     }
 
     async goTo(link) {
-        // Go to specifiex link
-
+        // Go to specific link
+        
         await this.page.goto(link, { waitUntil: 'networkidle0' });
     }
 
     getPage() {
         // Return Puppeteer page object
 
-        return this.page
+        return this.page;
     }
 }
 
 class ItemPage extends Page {
     // Class for individual item pages, extended from Page
-
-    constructor(id, keyword, page, size='', color='') {
+    
+    constructor(page, keyword, id='', size='', color='') {
         super(page);
 
         this.sizes = ['Small', 'Medium', 'Large', 'XLarge'];
@@ -58,10 +58,23 @@ class ItemPage extends Page {
         this.itemLink = `https://www.supremenewyork.com/shop/${id}`;
     }
 
-    async goToItem(link=this.itemLink) {
+    setItemLink (id='', link='') {
+        // Set item URL, based off of either item id or hard URL
+
+        if (id != '') {
+            this.id = id;
+            this.itemLink = `https://www.supremenewyork.com/shop/${id}`;
+        } else if (link != '') {
+            this.itemLink = link;
+        } else {
+            console.log('Call setItemLink with an argument, doofus.')
+        }
+    }
+
+    async goToItem() {
         // Go to item page
 
-        await Page.prototype.goTo.call(this, link);
+        await Page.prototype.goTo.call(this, this.itemLink);
     }
 
     async chooseColor(color=this.color) {       // todo: add failsafe for if color is not found
@@ -81,7 +94,7 @@ class ItemPage extends Page {
             const value = await (await option.getProperty('value')).jsonValue();
             await this.page.select('#s', value);
         } else {
-            console.log(`Chosen size, ${size}, does not match any values in ${sizes}`);
+            console.log(`Chosen size, ${size}, does not match any values in ${this.sizes}`);
         }
     }
 
