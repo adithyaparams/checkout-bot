@@ -11,8 +11,7 @@ const { credText, credSel } = require('./credentials.js');
     sampleItem.setItemLink(undefined, 'https://www.supremenewyork.com/shop/jackets/ptolbdx5q');
     await sampleItem.addItemMacro();
 
-    // todo: abstract away 'wait for checkout ready' button
-    await sampleItem.page.waitForSelector('a[class="button checkout"]', { visible: true });
+    await sampleItem.waitToCheckout();
 
     checkout = new breme.CheckoutPage(await browser.newPage());
     await checkout.goToCheckout(sampleItem.getPage());

@@ -67,7 +67,7 @@ class ItemPage extends Page {
         } else if (link != '') {
             this.itemLink = link;
         } else {
-            console.log('Call setItemLink with an argument, doofus.')
+            console.log('Call setItemLink with an argument, doofus.');
         }
     }
 
@@ -116,6 +116,10 @@ class ItemPage extends Page {
             await this.selectSize();        // If size provided, choose it
         }
         await this.addToCart();             // Add item to cart
+    }
+
+    async waitToCheckout() {
+        this.page.waitForSelector('a[class="button checkout"]', { visible: true });
     }
 }
 
