@@ -1,3 +1,5 @@
+// limited functionality supreme checkout bot
+
 const puppeteer = require('puppeteer');
 const axios = require('axios');
 
@@ -16,10 +18,19 @@ async function find_and_add(keyword, products, page, total) {
     await page.$eval('input[name="commit"]', btn => btn.click()).then(
       added => console.log(`added ${name}`),
       err => console.log(`${name} item sold out`))
+    console.log('waiting');
+    await page.waitForNavigation({ waitUntil: 'networkidle0' })
+    console.log('done waiting');
   } else { console.log(`${keyword} could not be found`) }
   counter += 1;
   console.log(`${keyword} ${counter} ${total}`)
-  if (counter == total) { setTimeout(() => checkout_page.goto('https://www.supremenewyork.com/checkout/'), 150) }
+  if (counter == total) {
+    // setTimeout(() => page.goto('https://www.supremenewyork.com/checkout/'), 2000).then(
+    //   await checkout_page.$eval('input[id="order_billing_name"]', el => el.value = 'Adithya Paramasivam')
+    // );
+    console.log('going to checkout')
+    page.goto('https://www.supremenewyork.com/checkout/')
+  }
 }
 
 async function add_items(products, keywords, pages) {   // add to cart macro for each item
@@ -31,7 +42,7 @@ async function add_items(products, keywords, pages) {   // add to cart macro for
 async function get_stock(past_week) {                   // load json and resolve if new release week
   try {
     const response = await axios.get('https://www.supremenewyork.com/mobile_stock.json');
-    let stock = response.data.products_and_categories.new;
+    let stock = response.data.products_and_categories.Accessories;  // switched new to Accessories
     const release = response.data.release_week;
     if (release != past_week && !discovered) {
       discovered = true;
@@ -48,9 +59,10 @@ async function full_purchase(keywords, past_week) {     // go through entire che
   let pages = [];
   discovered = false;
   counter = 0;
-  const browser = await puppeteer.connect({
-      browserWSEndpoint: endpoint,
-  });
+  // const browser = await puppeteer.connect({
+  //     browserWSEndpoint: endpoint,
+  // });
+  const browser = await puppeteer.launch({headless: false})
   for (let i = 0; i < keywords.length; i++) {
     pages[i] = await browser.newPage();
   }
@@ -64,8 +76,8 @@ async function full_purchase(keywords, past_week) {     // go through entire che
   }, 350);
 }
 
-// /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --no-first-run --no-default-browser-check --user-data-dir=$(mktemp -d -t 'chrome-remote_data_dir')
-const endpoint = 'ws://127.0.0.1:9222/devtools/browser/452986d8-3409-44d8-9f08-93063ea3b1f2'
+// 
+const endpoint = 'ws://127.0.0.1:9222/devtools/browser/78b5424a-cf18-45c1-ab7a-12c524d4c0ba'
 
 // full_purchase(['foulard', 'moka'], '17SS19')
-full_purchase(['mophie', 'terry'], '18SS19')
+full_purchase(['truck'], '18SS19')
