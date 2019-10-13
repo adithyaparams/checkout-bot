@@ -1,10 +1,51 @@
 const randomUseragent = require('random-useragent');
+const axios = require('axios');
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(pluginStealth());
 
 async function setBrowser() {
     return await puppeteer.launch({ headless: false });
+}
+
+async function getStock(currentDate=getCurrentDate()) {                   // load json and resolve if new release week
+    try {
+        const response = await axios.get('https://www.supremenewyork.com/mobile_stock.json');
+        let stock = response.data.products_and_categories.new;
+        const releaseDate = response.data.release_date;
+        if (releaseDate == currentDate) {
+            return stock;
+        } else {
+            return 'releaseDate does not equal currentDate';
+        }
+    }
+    catch(error) {
+      return error;
+    }
+}
+
+class ProductList {
+    // Class for parsing through product names, IDs
+
+    constructor(stockJSON) {
+        this.products = {};
+        for (let i = 0; i < stockJSON.length; i++) {
+            this.products[stockJSON[i].name.toLowerCase()] = stockJSON[i].id;
+        }
+    }
+
+    getStock() {
+        return this.products;
+    }
+
+    getID(keyword) {
+        for (const [key, value] of Object.entries(this.products)) {
+            if (key.includes(keyword)) {
+                return value;
+            }
+        }
+        return null
+    }
 }
 
 class Browser {
@@ -180,10 +221,11 @@ function getCurrentDate() {
     // Return current date in 'mm/dd/yyyy' format to compare against mobile_stock.json
 
     date = new Date();
-    monthFiller = (date.getMonth() < 10) ? '0' : null;      // Filler for months 1-9
-    dayFiller = (date.getDay() < 10) ? '0' : null;          // Filler for days 1-9
-    let y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
+    let dayFiller = '', monthFiller = ''
+    if (date.getMonth()+1 < 10) monthFiller = '0';     // Filler for months 1-9
+    if (date.getDate() < 10) dayFiller = '0';          // Filler for days 1-9
+    let y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate();
     return `${monthFiller}${m}/${dayFiller}${d}/${y}`;
 }
 
-module.exports = { setBrowser, Browser, ItemPage, SignInPage, CheckoutPage }
+module.exports = { setBrowser, getStock, Browser, ItemPage, SignInPage, CheckoutPage, ProductList }
