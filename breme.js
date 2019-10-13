@@ -8,21 +8,42 @@ async function setBrowser() {
     return await puppeteer.launch({ headless: false });
 }
 
-async function getStock(currentDate=getCurrentDate()) {                   // load json and resolve if new release week
-    try {
-        const response = await axios.get('https://www.supremenewyork.com/mobile_stock.json');
-        let stock = response.data.products_and_categories.new;
-        const releaseDate = response.data.release_date;
-        if (releaseDate == currentDate) {
-            return stock;
-        } else {
-            return 'releaseDate does not equal currentDate';
+async function retrieveStock(postStock) {
+
+    var discovered = false;
+
+    async function getStock(currentDate=getCurrentDate()) {                   // load json and resolve if new release week
+        try {
+            const response = await axios.get('https://www.supremenewyork.com/mobile_stock.json');
+            let stock = response.data.products_and_categories.new;
+            const releaseDate = response.data.release_date;
+            if (!discovered && releaseDate == currentDate) {
+                discovered = true;
+                return stock;
+            } else if (discovered) {
+                return 'mobileStock.json already retrieved';
+            } else {
+                return 'releaseDate does not equal currentDate';
+            }
+        }
+        catch(error) {
+          return error;
         }
     }
-    catch(error) {
-      return error;
-    }
+
+    let updateCheck = setInterval(async function() {
+        let newStock = await getStock('10/10/2019');      // SUBSTITUTED WITH LAST WEEKS RELEASE DATE
+        if (typeof(newStock) === 'object') {
+            clearInterval(updateCheck);
+            await postStock(newStock);
+        } else {
+            console.log(newStock);
+        }
+    }, 300);
+
 }
+
+// todo: use null return value from getInfo as a failsafe if keyword does not match with a product/id
 
 class ProductList {
     // Class for parsing through product names, IDs
@@ -38,13 +59,13 @@ class ProductList {
         return this.products;
     }
 
-    getID(keyword) {
+    getInfo(keyword) {
         for (const [key, value] of Object.entries(this.products)) {
             if (key.includes(keyword)) {
-                return value;
+                return {'name' : key, 'ID' : value};
             }
         }
-        return null
+        return null;
     }
 }
 
@@ -88,12 +109,12 @@ class Page {
 class ItemPage extends Page {
     // Class for individual item pages, extended from Page
     
-    constructor(page, keyword, id='', size='', color='') {
+    constructor(page, name, id='', size='', color='') {
         super(page);
 
         this.sizes = ['Small', 'Medium', 'Large', 'XLarge'];
         this.id = id;
-        this.keyword = keyword;
+        this.name = name;
         this.size = size;
         this.color = color;
         this.itemLink = `https://www.supremenewyork.com/shop/${id}`;
@@ -140,7 +161,7 @@ class ItemPage extends Page {
     }
 
     async addToCart() {
-        await this.page.$eval('input[name="commit"]', btn => btn.click())
+        await this.page.$eval('input[name="commit"]', btn => btn.click());
         // .then(
         //     added => console.log(`added ${name}`),
         //     err => console.log(`${name} item sold out`))
@@ -160,7 +181,7 @@ class ItemPage extends Page {
     }
 
     async waitToCheckout() {
-        this.page.waitForSelector('a[class="button checkout"]', { visible: true });
+        await this.page.waitForSelector('a[class="button checkout"]', { visible: true });
     }
 }
 
@@ -228,4 +249,4 @@ function getCurrentDate() {
     return `${monthFiller}${m}/${dayFiller}${d}/${y}`;
 }
 
-module.exports = { setBrowser, getStock, Browser, ItemPage, SignInPage, CheckoutPage, ProductList }
+module.exports = { setBrowser, retrieveStock, Browser, ItemPage, SignInPage, CheckoutPage, ProductList}
