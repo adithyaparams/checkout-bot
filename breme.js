@@ -12,7 +12,7 @@ async function retrieveStock(postStock) {
 
     var discovered = false;
 
-    async function getStock(currentDate=getCurrentDate()) {                   // load json and resolve if new release week
+    async function getStock(currentDate=getCurrentDate()) {
         try {
             const response = await axios.get('https://www.supremenewyork.com/mobile_stock.json');
             let stock = response.data.products_and_categories.new;
@@ -43,7 +43,15 @@ async function retrieveStock(postStock) {
 
 }
 
-// todo: use null return value from getInfo as a failsafe if keyword does not match with a product/id
+class Product {
+    // Class for creating and parsing through desired items
+
+    constructor(keyword, size='', color='') {
+        this.keyword = keyword.toLowerCase();
+        this.size = size;
+        this.color = color;
+    }
+}
 
 class ProductList {
     // Class for parsing through product names, IDs
@@ -249,4 +257,4 @@ function getCurrentDate() {
     return `${monthFiller}${m}/${dayFiller}${d}/${y}`;
 }
 
-module.exports = { setBrowser, retrieveStock, Browser, ItemPage, SignInPage, CheckoutPage, ProductList}
+module.exports = { setBrowser, retrieveStock, Browser, ItemPage, SignInPage, CheckoutPage, ProductList, Product }
