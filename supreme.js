@@ -14,7 +14,6 @@ const { credText, credSel } = require('./credentials.js');
         // iterate through item list
         for (let i = 0; i < itemList.length; i++) {
             itemInfo = newProducts.getInfo(itemList[i].keyword);
-            console.log(itemInfo);
             if (!!itemInfo) {
                 officialItemList.push(sampleItem = new breme.ItemPage(await browser.newPage(), itemInfo['name'], itemInfo['ID'], 
                                                                                     size=itemList[i].size, color=itemList[i].color));
