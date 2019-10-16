@@ -219,16 +219,33 @@ class CheckoutPage extends Page {
         Page.prototype.goTo.call(this, this.checkoutLink);
     }
 
-    async autofill(credText, credSel) {
+    async autofill(shipping, billing) {
         // Fill in text and menu inputs with info from credentials.js file
         
-        for (var i = 0; i < this.textSelectors.length; i++) {
-            await this.page.waitForSelector(`#${this.textSelectors[i]}`);
-            await this.page.type(`#${this.textSelectors[i]}`, credText[i], { delay: 1 });
-        }
-        for (var i = 0; i < this.selSelectors.length; i++) {
-            await this.page.select(`#${this.selSelectors[i]}`, credSel[i]);
-        }
+        await this.page.waitForSelector(`#order_billing_name`);
+
+        await this.page.type(`#order_billing_name`, shipping['name'], { delay: 1 });
+        await this.page.type(`#order_email`, shipping['email'], { delay: 1 });
+        await this.page.type(`#order_tel`, shipping['tel'], { delay: 1 });
+        await this.page.type(`#bo`, shipping['address'], { delay: 1 });
+        await this.page.type(`#oba3`, shipping['apt'], { delay: 1 });
+        await this.page.type(`#zip_label`, shipping['zip'], { delay: 1 });
+        await this.page.type(`#order_billing_city`, shipping['city'], { delay: 1 });
+        await this.page.select(`#order_billing_state`, shipping['state']);
+        await this.page.select(`#order_billing_country`, shipping['country']);
+
+        await this.page.type(`#cnb`, billing['card'], { delay: 1 });
+        await this.page.type(`#vval`, billing['cvv'], { delay: 1 });
+        await this.page.select(`#credit_card_month`, billing['expm']);
+        await this.page.select(`#credit_card_year`, billing['expy']);
+
+        // for (var i = 0; i < this.textSelectors.length; i++) {
+        //     await this.page.waitForSelector(`#${this.textSelectors[i]}`);
+        //     await this.page.type(`#${this.textSelectors[i]}`, credText[i], { delay: 1 });
+        // }
+        // for (var i = 0; i < this.selSelectors.length; i++) {
+        //     await this.page.select(`#${this.selSelectors[i]}`, credSel[i]);
+        // }
     }
 }
 

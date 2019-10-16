@@ -1,5 +1,5 @@
 const breme = require('./breme.js');
-const { credText, credSel } = require('./credentials.js');
+const credentials = require('./credentials.js');
 
 (async() => {
     // Main function
@@ -28,7 +28,7 @@ const { credText, credSel } = require('./credentials.js');
 
         checkout = new breme.CheckoutPage(await browser.newPage());
         await checkout.goToCheckout(sampleItem.getPage());
-        await checkout.autofill(credText, credSel);
+        await checkout.autofill(credentials.shipping, credentials.billing);
     }
 
     let itemList = [];
@@ -38,7 +38,7 @@ const { credText, credSel } = require('./credentials.js');
     browser = new breme.Browser(await breme.setBrowser());
     
     signIn = new breme.SignInPage(await browser.newPage());
-    await signIn.signIn('liberati.ties@gmail.com', 'Weloveali.');
+    await signIn.signIn(credentials.gCredentials['username'], credentials.gCredentials['password']);
 
     await breme.retrieveStock(postRetrieval);
 
