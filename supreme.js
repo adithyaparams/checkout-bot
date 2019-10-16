@@ -9,6 +9,7 @@ const credentials = require('./credentials.js');
 
         newProducts = new breme.ProductList(stock);
 
+        itemList = credentials.items;
         officialItemList = [];
         
         // iterate through item list
@@ -30,10 +31,6 @@ const credentials = require('./credentials.js');
         await checkout.goToCheckout(sampleItem.getPage());
         await checkout.autofill(credentials.shipping, credentials.billing);
     }
-
-    let itemList = [];
-    itemList.push(new breme.Product('piping', 'Medium', 'White'));
-    itemList.push(new breme.Product('makah zip up jacket', 'Large', 'Teal'));
 
     browser = new breme.Browser(await breme.setBrowser());
     
