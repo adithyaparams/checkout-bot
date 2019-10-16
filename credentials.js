@@ -1,9 +1,9 @@
 const breme = require('./breme.js');
 
-gCredentials = {'username' : 'johndoe@gmail.com',
-                    'password' : 'Subreme123'}
+const gCredentials = {'username' : 'john.doe@gmail.com',
+                    'password' : 'subreme123.'}
 
-shipping = {'name' : 'John Doe',
+const shipping = {'name' : 'John Doe',
                 'email' : 'johndoe@gmail.com',
                 'tel' : '123 456 7890',
                 'address' : '1 Subreme Boulevard',
@@ -13,9 +13,9 @@ shipping = {'name' : 'John Doe',
                 'state' : 'NY',
                 'country' : 'USA'}
 
-billing = {'card' : '1234123412341234',
+const billing = {'card' : '1234123412341234',
             'expm' : '12',
-            'expd' : '2019',
+            'expy' : '2019',
             'cvv' : '123'}
 
 // Create products with arguments (keyword, size, color)
@@ -24,4 +24,4 @@ billing = {'card' : '1234123412341234',
 const items = [ new breme.Product('piping', 'Medium', 'White'),
                     new breme.Product('makah zip up jacket', 'Large', 'Teal')]
 
-module.exports = { gCredentials, shipping, billing }
+module.exports = { gCredentials, shipping, billing, items }
