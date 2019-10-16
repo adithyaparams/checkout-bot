@@ -128,7 +128,7 @@ class ItemPage extends Page {
         this.itemLink = `https://www.supremenewyork.com/shop/${id}`;
     }
 
-    setItemLink (id='', link='') {
+    setItemLink (id='', link='') {          // TESTING
         // Set item URL, based off of either item id or hard URL
 
         if (id != '') {
@@ -178,14 +178,20 @@ class ItemPage extends Page {
     async addItemMacro() {
         // Combine item-related steps for one abstracted macro
 
-        await this.goToItem();              // Go to item's page
-        if (this.color != '') {
-            await this.chooseColor();       // If color provided, choose it
+        try {
+            await this.goToItem();              // Go to item's page
+            if (this.color != '') {
+                await this.chooseColor();       // If color provided, choose it
+            }
+            if (this.size != '') {
+                await this.selectSize();        // If size provided, choose it
+            }
+            await this.addToCart();             // Add item to cart
         }
-        if (this.size != '') {
-            await this.selectSize();        // If size provided, choose it
+        catch (error) {
+            console.log(`Hit error on ${this.name}, the item is likely sold out`);
+            console.log(error);
         }
-        await this.addToCart();             // Add item to cart
     }
 
     async waitToCheckout() {
