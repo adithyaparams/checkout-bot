@@ -12,7 +12,7 @@ async function retrieveStock(postStock) {
 
     var discovered = false;
 
-    async function getStock(currentDate=getCurrentDate()) {
+    async function getStock(currentDate='10/17/2019') {             // SWITCHED
         try {
             const response = await axios.get('https://www.supremenewyork.com/mobile_stock.json');
             let stock = response.data.products_and_categories.new;
@@ -23,7 +23,7 @@ async function retrieveStock(postStock) {
             } else if (discovered) {
                 return 'mobileStock.json already retrieved';
             } else {
-                return 'releaseDate does not equal currentDate';
+                return `releaseDate ${releaseDate} does not equal currentDate ${currentDate}`;
             }
         }
         catch(error) {
@@ -32,7 +32,7 @@ async function retrieveStock(postStock) {
     }
 
     let updateCheck = setInterval(async function() {
-        let newStock = await getStock('10/10/2019');      // SUBSTITUTED WITH LAST WEEKS RELEASE DATE
+        let newStock = await getStock();      // SUBSTITUTED WITH LAST WEEKS RELEASE DATE
         if (typeof(newStock) === 'object') {
             clearInterval(updateCheck);
             await postStock(newStock);
@@ -150,8 +150,7 @@ class ItemPage extends Page {
     async chooseColor(color=this.color) {       // todo: add failsafe for if color is not found
         // Choose specified color for product
 
-        let colorLink = await this.page.$eval(`a[data-style-name="${color}"]`, el => el.href);
-        await Page.prototype.goTo.call(this, colorLink);
+        await this.page.$eval(`button[data-style-name="${color}"]`, btn => btn.click());
     }
 
     async selectSize(size=this.size) {          // todo: add failsafe for if size is not found
@@ -238,14 +237,6 @@ class CheckoutPage extends Page {
         await this.page.type(`#vval`, billing['cvv'], { delay: 1 });
         await this.page.select(`#credit_card_month`, billing['expm']);
         await this.page.select(`#credit_card_year`, billing['expy']);
-
-        // for (var i = 0; i < this.textSelectors.length; i++) {
-        //     await this.page.waitForSelector(`#${this.textSelectors[i]}`);
-        //     await this.page.type(`#${this.textSelectors[i]}`, credText[i], { delay: 1 });
-        // }
-        // for (var i = 0; i < this.selSelectors.length; i++) {
-        //     await this.page.select(`#${this.selSelectors[i]}`, credSel[i]);
-        // }
     }
 }
 
